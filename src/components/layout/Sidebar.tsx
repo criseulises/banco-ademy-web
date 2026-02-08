@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { colors } from '@/styles/colors';
 
 interface SubMenuItem {
   label: string;
@@ -16,6 +18,7 @@ interface MenuItem {
 }
 
 const Sidebar = () => {
+  const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(['Transferencias', 'Pagos']);
 
   const menuItems: MenuItem[] = [
@@ -80,93 +83,194 @@ const Sidebar = () => {
     );
   };
 
+  const isActive = (href?: string) => {
+    if (!href) return false;
+    return pathname === href || pathname.startsWith(href + '/');
+  };
+
   return (
-    <aside className="w-[280px] h-screen bg-white border-r border-gray-200 overflow-y-auto">
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-gray-100">
+    <aside className="w-[280px] h-screen bg-white overflow-y-auto">
+      {/* Mis productos section */}
+      <div className="px-6 py-5">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 flex items-center justify-center">
+          <div className="w-7 h-7 flex items-center justify-center">
             <Image
               src="/icon/sidebar/cartera.svg"
               alt="Mis productos"
               width={24}
               height={24}
-              className="text-cyan-500"
+              style={{ filter: 'brightness(0) saturate(100%) invert(47%) sepia(65%) saturate(1195%) hue-rotate(152deg) brightness(91%) contrast(101%)' }}
             />
           </div>
-          <h2 className="text-[17px] font-semibold text-cyan-500">
+          <h2
+            className="text-[16px] font-semibold"
+            style={{ color: colors.primary }}
+          >
             Mis productos
           </h2>
         </div>
       </div>
 
       {/* Menu Items */}
-      <nav className="py-3">
-        {menuItems.map((item, index) => (
-          <div key={index}>
-            {/* Main Item */}
-            <button
-              onClick={() => item.subItems && toggleItem(item.label)}
-              className={`w-full flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors duration-150 ${
-                !item.subItems ? 'cursor-pointer' : ''
-              }`}
-            >
-              <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-                <Image
-                  src={item.icon}
-                  alt={item.label}
-                  width={22}
-                  height={22}
-                  className="opacity-80"
-                />
-              </div>
-              <span className="text-[15px] font-semibold text-gray-800 flex-1 text-left">
-                {item.label}
-              </span>
-              {item.subItems && (
-                <svg
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                    expandedItems.includes(item.label) ? 'rotate-90' : ''
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              )}
-            </button>
+      <nav className="py-2">
+        {menuItems.map((item, index) => {
+          const itemIsActive = isActive(item.href);
+          const hasActiveChild = item.subItems?.some(sub => isActive(sub.href));
 
-            {/* Sub Items */}
-            {item.subItems && expandedItems.includes(item.label) && (
-              <div className="relative">
-                {/* Vertical connecting line */}
-                <div className="absolute left-[42px] top-0 bottom-0 w-[1.5px] bg-gray-300" />
-                
-                {item.subItems.map((subItem, subIndex) => (
-                  <div key={subIndex} className="relative">
-                    {/* Horizontal connecting line */}
-                    <div className="absolute left-[42px] top-[18px] w-[20px] h-[1.5px] bg-gray-300" />
-                    
-                    <a
-                      href={subItem.href}
-                      className="flex items-center pl-[74px] pr-5 py-[10px] hover:bg-gray-50 transition-colors duration-150 group"
-                    >
-                      <span className="text-[14px] text-gray-600 group-hover:text-gray-900 transition-colors">
-                        {subItem.label}
-                      </span>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          return (
+            <div key={index}>
+              {/* Main Item */}
+              <button
+                onClick={() => item.subItems && toggleItem(item.label)}
+                className={`w-full flex items-center gap-3 px-6 py-3 transition-all duration-200 ${
+                  !item.subItems ? 'cursor-pointer' : ''
+                }`}
+                style={{
+                  backgroundColor: itemIsActive ? colors.grey50 : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (!itemIsActive) {
+                    e.currentTarget.style.backgroundColor = colors.grey50;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!itemIsActive) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                  <Image
+                    src={item.icon}
+                    alt={item.label}
+                    width={24}
+                    height={24}
+                    style={{
+                      filter: itemIsActive || hasActiveChild
+                        ? 'brightness(0) saturate(100%) invert(47%) sepia(65%) saturate(1195%) hue-rotate(152deg) brightness(91%) contrast(101%)'
+                        : 'brightness(0) saturate(0%) brightness(30%)'
+                    }}
+                  />
+                </div>
+                <span
+                  className="text-[15px] font-semibold flex-1 text-left"
+                  style={{
+                    color: itemIsActive || hasActiveChild ? colors.textPrimary : colors.grey700,
+                  }}
+                >
+                  {item.label}
+                </span>
+                {item.subItems && (
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-300 ${
+                      expandedItems.includes(item.label) ? 'rotate-90' : ''
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                )}
+              </button>
+
+              {/* Sub Items with Curved Lines */}
+              {item.subItems && expandedItems.includes(item.label) && (
+                <div className="overflow-hidden transition-all duration-300 animate-slide-down">
+                  {item.subItems.map((subItem, subIndex) => {
+                    const subIsActive = isActive(subItem.href);
+                    const isLast = subIndex === item.subItems!.length - 1;
+
+                    return (
+                      <div key={subIndex} className="relative group/item">
+                        {/* Curved connecting line */}
+                        <div
+                          className="absolute left-[38px] w-[2px] transition-colors duration-200"
+                          style={{
+                            backgroundColor: colors.grey700,
+                            top: 0,
+                            height: isLast ? '50%' : '100%',
+                          }}
+                        />
+
+                        {/* Horizontal curved connector */}
+                        <div
+                          className="absolute transition-colors duration-200"
+                          style={{
+                            left: '38px',
+                            top: '50%',
+                            width: '16px',
+                            height: '16px',
+                            transform: 'translateY(-50%)',
+                            borderLeft: `2px solid ${colors.grey700}`,
+                            borderBottom: `2px solid ${colors.grey700}`,
+                            borderBottomLeftRadius: '8px',
+                          }}
+                        />
+
+                        <a
+                          href={subItem.href}
+                          className="flex items-center pl-[68px] pr-6 py-2.5 transition-all duration-150 relative"
+                          style={{
+                            backgroundColor: subIsActive ? colors.grey50 : 'transparent',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!subIsActive) {
+                              e.currentTarget.style.backgroundColor = colors.grey50;
+                            }
+                            // Cambiar color de las líneas al hover
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              const verticalLine = parent.querySelector('.absolute.w-\\[2px\\]') as HTMLElement;
+                              const curvedLine = parent.querySelectorAll('.absolute')[1] as HTMLElement;
+                              if (verticalLine) verticalLine.style.backgroundColor = colors.primary;
+                              if (curvedLine) {
+                                curvedLine.style.borderLeftColor = colors.primary;
+                                curvedLine.style.borderBottomColor = colors.primary;
+                              }
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!subIsActive) {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }
+                            // Restaurar color de las líneas
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              const verticalLine = parent.querySelector('.absolute.w-\\[2px\\]') as HTMLElement;
+                              const curvedLine = parent.querySelectorAll('.absolute')[1] as HTMLElement;
+                              if (verticalLine) verticalLine.style.backgroundColor = colors.grey700;
+                              if (curvedLine) {
+                                curvedLine.style.borderLeftColor = colors.grey700;
+                                curvedLine.style.borderBottomColor = colors.grey700;
+                              }
+                            }
+                          }}
+                        >
+                          <span
+                            className="text-[14px] transition-colors"
+                            style={{
+                              color: subIsActive ? colors.textPrimary : colors.grey700,
+                              fontWeight: subIsActive ? 700 : 600,
+                            }}
+                          >
+                            {subItem.label}
+                          </span>
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );
