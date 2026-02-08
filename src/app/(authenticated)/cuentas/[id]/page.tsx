@@ -1,71 +1,110 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { colors } from '@/styles/colors';
+import { formatRelativeDate } from '@/utils/dateUtils';
 
 type FilterType = 'todo' | 'credito' | 'debito';
 
+interface Account {
+  id: string;
+  userId: string;
+  accountNumber: string;
+  accountType: string;
+  currency: string;
+  balance: number;
+  availableBalance: number;
+  holdBalance: number;
+  status: string;
+  nickname: string;
+  interestRate: number;
+}
+
 interface Transaction {
   id: string;
-  type: 'credito' | 'debito';
-  title: string;
-  reference: string;
+  accountId: string;
+  type: string;
   amount: number;
+  description: string;
+  reference: string;
   date: string;
+  status: string;
 }
 
 export default function AccountDetailsPage() {
+  const params = useParams();
+  const accountId = params.id as string;
+
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('todo');
+  const [account, setAccount] = useState<Account | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - en producción vendría del servidor
-  const account = {
-    id: '001010286647359',
-    name: 'Primera casa',
-    type: 'Cuenta de ahorro',
-    balance: 248556.32,
-    icon: '/icon/custom/pig.svg',
-  };
+  useEffect(() => {
+    // Cargar datos de la cuenta
+    Promise.all([
+      fetch('/mock_data/accounts.json').then(res => res.json()),
+      fetch('/mock_data/transactions.json').then(res => res.json()),
+    ])
+      .then(([accountsData, transactionsData]) => {
+        // Buscar la cuenta por número de cuenta
+        const foundAccount = accountsData.accounts.find(
+          (acc: Account) => acc.accountNumber === accountId
+        );
+        setAccount(foundAccount || null);
 
-  const transactions: Transaction[] = [
-    {
-      id: '1',
-      type: 'credito',
-      title: 'Depósito mensual',
-      reference: '20250621974316',
-      amount: 10000.00,
-      date: '26 de junio, 2025',
-    },
-    {
-      id: '2',
-      type: 'debito',
-      title: 'Pago préstamo lavadora',
-      reference: '20250621947862',
-      amount: 3204.63,
-      date: '26 de junio, 2025',
-    },
-    {
-      id: '3',
-      type: 'credito',
-      title: 'Depósito mensual',
-      reference: '20250621974316',
-      amount: 10000.00,
-      date: '26 de junio, 2025',
-    },
-    {
-      id: '4',
-      type: 'credito',
-      title: 'Depósito mensual',
-      reference: '20250621974316',
-      amount: 10000.00,
-      date: '26 de junio, 2025',
-    },
-  ];
+        // Filtrar transacciones de esta cuenta
+        const accountTransactions = transactionsData.transactions.filter(
+          (tx: any) => tx.accountId === foundAccount?.id
+        );
+        setTransactions(accountTransactions);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error loading account data:', error);
+        setLoading(false);
+      });
+  }, [accountId]);
 
   const filteredTransactions = transactions.filter(t => {
     if (selectedFilter === 'todo') return true;
-    return t.type === selectedFilter;
+    if (selectedFilter === 'credito') return t.type === 'DEPOSITO' || t.type === 'TRANSFERENCIA_RECIBIDA';
+    if (selectedFilter === 'debito') return t.type === 'RETIRO_ATM' || t.type === 'TRANSFERENCIA_ENVIADA' || t.type === 'PAGO_PRESTAMO' || t.type === 'PAGO_TARJETA' || t.type === 'PAGO_SERVICIO' || t.type === 'COMPRA_COMERCIO';
+    return true;
   });
+
+  const getTransactionDisplayType = (type: string): 'credito' | 'debito' => {
+    const creditTypes = ['DEPOSITO', 'TRANSFERENCIA_RECIBIDA'];
+    return creditTypes.includes(type) ? 'credito' : 'debito';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.background }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: colors.primary }}></div>
+          <p style={{ color: colors.textSecondary }}>Cargando detalles de cuenta...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!account) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.background }}>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2" style={{ color: colors.textPrimary }}>
+            Cuenta no encontrada
+          </h2>
+          <p style={{ color: colors.textSecondary }}>
+            No se pudo encontrar la cuenta solicitada
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const actionButtons = [
     { label: 'Transferir', icon: '/icon/tabler/tabler-icon-arrows-exchange-2.svg' },
@@ -92,7 +131,7 @@ export default function AccountDetailsPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h2 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
-                      {account.name}
+                      {account.nickname || 'Mi Cuenta'}
                     </h2>
                     <Image
                       src="/icon/tabler/tabler-icon-edit.svg"
@@ -106,12 +145,12 @@ export default function AccountDetailsPage() {
                     />
                   </div>
                   <p className="text-sm" style={{ color: colors.textSecondary }}>
-                    {account.type}
+                    {account.accountType}
                   </p>
                 </div>
                 <Image
-                  src={account.icon}
-                  alt={account.type}
+                  src="/icon/custom/pig.svg"
+                  alt={account.accountType}
                   width={56}
                   height={56}
                   style={{
@@ -122,7 +161,7 @@ export default function AccountDetailsPage() {
 
               <div className="flex items-end justify-between mt-auto">
                 <p className="text-sm" style={{ color: colors.grey500 }}>
-                  {account.id}
+                  {account.accountNumber}
                 </p>
                 <p className="text-5xl font-bold" style={{ color: colors.textPrimary }}>
                   RD$ {account.balance.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -241,59 +280,62 @@ export default function AccountDetailsPage() {
 
               {/* Transactions List */}
               <div className="space-y-4">
-                {filteredTransactions.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between py-3 border-b last:border-b-0"
-                    style={{ borderColor: colors.grey200 }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{
-                          backgroundColor: transaction.type === 'credito' ? '#0095A920' : '#FF444420',
-                        }}
-                      >
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke={transaction.type === 'credito' ? '#0095A9' : '#FF4444'}
-                          strokeWidth="2"
+                {filteredTransactions.map((transaction) => {
+                  const displayType = getTransactionDisplayType(transaction.type);
+                  return (
+                    <div
+                      key={transaction.id}
+                      className="flex items-center justify-between py-3 border-b last:border-b-0"
+                      style={{ borderColor: colors.grey200 }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{
+                            backgroundColor: displayType === 'credito' ? '#0095A920' : '#FF444420',
+                          }}
                         >
-                          {transaction.type === 'credito' ? (
-                            <path d="M12 19V5M5 12l7-7 7 7" />
-                          ) : (
-                            <path d="M12 5v14M19 12l-7 7-7-7" />
-                          )}
-                        </svg>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke={displayType === 'credito' ? '#0095A9' : '#FF4444'}
+                            strokeWidth="2"
+                          >
+                            {displayType === 'credito' ? (
+                              <path d="M12 19V5M5 12l7-7 7 7" />
+                            ) : (
+                              <path d="M12 5v14M19 12l-7 7-7-7" />
+                            )}
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-bold" style={{ color: colors.textPrimary }}>
+                            {transaction.description}
+                          </p>
+                          <p className="text-sm" style={{ color: colors.grey500 }}>
+                            {transaction.reference}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold" style={{ color: colors.textPrimary }}>
-                          {transaction.title}
+
+                      <div className="text-right">
+                        <p
+                          className="text-lg font-bold"
+                          style={{
+                            color: displayType === 'credito' ? '#0095A9' : '#FF4444',
+                          }}
+                        >
+                          {displayType === 'credito' ? '+' : '-'}RD$ {transaction.amount.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-sm" style={{ color: colors.grey500 }}>
-                          {transaction.reference}
+                          {formatRelativeDate(transaction.date)}
                         </p>
                       </div>
                     </div>
-
-                    <div className="text-right">
-                      <p
-                        className="text-lg font-bold"
-                        style={{
-                          color: transaction.type === 'credito' ? '#0095A9' : '#FF4444',
-                        }}
-                      >
-                        RD$ {transaction.amount.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                      <p className="text-sm" style={{ color: colors.grey500 }}>
-                        {transaction.date}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
         </div>
       </div>
