@@ -268,9 +268,8 @@ export default function CardDetailsPage() {
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => setSelectedFilter('todo')}
-              className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                selectedFilter === 'todo' ? 'font-semibold' : ''
-              }`}
+              className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedFilter === 'todo' ? 'font-semibold' : ''
+                }`}
               style={{
                 borderColor: selectedFilter === 'todo' ? '#FA6C26' : colors.grey300,
                 backgroundColor: selectedFilter === 'todo' ? '#FA6C2610' : 'white',
@@ -295,9 +294,8 @@ export default function CardDetailsPage() {
 
             <button
               onClick={() => setSelectedFilter('credito')}
-              className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                selectedFilter === 'credito' ? 'font-semibold' : ''
-              }`}
+              className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedFilter === 'credito' ? 'font-semibold' : ''
+                }`}
               style={{
                 borderColor: selectedFilter === 'credito' ? '#FA6C26' : colors.grey300,
                 backgroundColor: selectedFilter === 'credito' ? '#FA6C2610' : 'white',
@@ -322,9 +320,8 @@ export default function CardDetailsPage() {
 
             <button
               onClick={() => setSelectedFilter('debito')}
-              className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                selectedFilter === 'debito' ? 'font-semibold' : ''
-              }`}
+              className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedFilter === 'debito' ? 'font-semibold' : ''
+                }`}
               style={{
                 borderColor: selectedFilter === 'debito' ? '#FA6C26' : colors.grey300,
                 backgroundColor: selectedFilter === 'debito' ? '#FA6C2610' : 'white',
@@ -363,20 +360,37 @@ export default function CardDetailsPage() {
                           backgroundColor: displayType === 'credito' ? '#5FBFC420' : '#F47B5620',
                         }}
                       >
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke={displayType === 'credito' ? '#5FBFC4' : '#F47B56'}
-                          strokeWidth="2.5"
-                        >
-                          {displayType === 'credito' ? (
-                            <path d="M12 19V5M5 12l7-7 7 7" />
-                          ) : (
-                            <path d="M12 5v14M19 12l-7 7-7-7" />
-                          )}
-                        </svg>
+                        {displayType === 'credito' ? (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#5FBFC4"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="3 17 9 11 13 15 21 7" />
+                            <polyline points="14 7 21 7 21 14" />
+                          </svg>
+                        ) : (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#F47B56"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="3 7 9 13 13 9 21 17" />
+                            <polyline points="21 10 21 17 14 17" />
+                          </svg>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-base mb-1" style={{ color: colors.textPrimary }}>

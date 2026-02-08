@@ -120,13 +120,6 @@ export default function Beneficiarios() {
       .catch(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    function close() {
-      setMenuOpen(null);
-    }
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  }, []);
 
   const filtered = beneficiaries.filter((b) => {
     const matchSearch =
@@ -608,6 +601,11 @@ export default function Beneficiarios() {
           </div>
         </div>
       </div>
+
+      {/* Overlay para cerrar menús desplegables */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-5" onClick={() => setMenuOpen(null)} />
+      )}
 
       {/* ── Add / Edit Dialog ── */}
       {(dialog === 'add' || dialog === 'edit') && (
