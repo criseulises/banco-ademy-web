@@ -23,12 +23,12 @@ const Sidebar = () => {
 
   const menuItems: MenuItem[] = [
     {
-      icon: '/icon/sidebar/cartera.svg',
+      icon: '/icon/tabler/tabler-icon-wallet.svg',
       label: 'Mis productos',
       href: '/dashboard',
     },
     {
-      icon: '/icon/sidebar/transferencia.svg',
+      icon: '/icon/tabler/tabler-icon-arrows-exchange-2.svg',
       label: 'Transferencias',
       subItems: [
         { label: 'Propias', href: '/transferencias/propias' },
@@ -37,7 +37,7 @@ const Sidebar = () => {
       ],
     },
     {
-      icon: '/icon/sidebar/tabler-icon-cash.svg',
+      icon: '/icon/tabler/tabler-icon-file-pay.svg',
       label: 'Pagos',
       subItems: [
         { label: 'Tarjetas', href: '/pagos/tarjetas' },
@@ -49,27 +49,27 @@ const Sidebar = () => {
       ],
     },
     {
-      icon: '/icon/sidebar/tabler-icon-file-time.svg',
+      icon: '/icon/tabler/tabler-icon-file-time.svg',
       label: 'Movimientos',
       href: '/movimientos',
     },
     {
-      icon: '/icon/sidebar/tabler-icon-category-plus.svg',
+      icon: '/icon/tabler/tabler-icon-category-plus.svg',
       label: 'Solicitudes',
       href: '/solicitudes',
     },
     {
-      icon: '/icon/sidebar/tabler-icon-phone.svg',
+      icon: '/icon/tabler/tabler-icon-phone.svg',
       label: 'Contacto',
       href: '/contacto',
     },
     {
-      icon: '/icon/sidebar/tabler-icon-users.svg',
+      icon: '/icon/tabler/tabler-icon-users.svg',
       label: 'Beneficiarios',
       href: '/beneficiarios',
     },
     {
-      icon: '/icon/sidebar/cartera.svg',
+      icon: '/icon/tabler/tabler-icon-settings.svg',
       label: 'Configuración',
       href: '/configuracion',
     },
