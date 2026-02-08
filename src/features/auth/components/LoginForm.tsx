@@ -8,7 +8,7 @@ import { User, Lock } from "lucide-react";
 import { loginSchema, LoginFormData } from "../schema/loginSchema";
 import { useLogin } from "../hooks/useLogin";
 import { InputField } from "@/components/ui/InputField";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
 
 export const LoginForm = () => {
   const { isLoading, error, handleLogin } = useLogin();
