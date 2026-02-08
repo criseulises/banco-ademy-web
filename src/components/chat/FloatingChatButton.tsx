@@ -18,7 +18,7 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
       onClick={onClick}
       className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
       style={{
-        background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+        backgroundColor: '#ffffff', // Fondo blanco
       }}
       aria-label="Abrir asistente de chat"
     >
@@ -45,7 +45,7 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
       <div
         className="absolute inset-0 rounded-full animate-ping opacity-20"
         style={{
-          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+          backgroundColor: '#ffffff', // Fondo blanco para el efecto de pulsación
         }}
       />
     </button>

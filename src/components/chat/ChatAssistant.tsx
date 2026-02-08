@@ -49,13 +49,13 @@ export const ChatAssistant: React.FC = () => {
         <div className="bg-white rounded-[36px] h-full flex flex-col relative overflow-hidden">
           {/* Imagen Centrada - SOLO cuando no hay mensajes */}
           {showImage && (
-            <div className="absolute top-70 left-0 right-0 flex justify-center">
+            <div className="absolute top-40 left-0 right-0 flex justify-center">
               <div className="w-36 h-34 transform -translate-y-1/2">
                 <Image
                   src="/icon/use-app/chat-smile.svg"
                   alt="Chat Assistant"
-                  width={144}
-                  height={136}
+                  width={134}
+                  height={126}
                   className="object-contain"
                   priority
                 />

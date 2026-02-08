@@ -42,7 +42,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
+        className="fixed inset-0 bg-white/45 bg-opacity-50 z-50 transition-opacity duration-300"
         onClick={onClose}
         aria-label="Cerrar chat"
       />
